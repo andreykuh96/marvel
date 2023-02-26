@@ -3,6 +3,7 @@ import { Component } from 'react';
 import MarvelServices from '../../services/MarvelServices';
 import ErrorMessage from '../UI/errorMessage/ErrorMessage';
 import Spinner from '../UI/Spinner';
+import PropTypes from 'prop-types';
 
 class CharList extends Component {
     state = {
@@ -60,8 +61,20 @@ class CharList extends Component {
         }))
     }
 
+    itemsRef = [];
+
+    setRef = el => {
+        this.itemsRef.push(el);
+    }
+
+    focusOnItem = (id) => {
+        this.itemsRef.forEach(item => item.classList.remove('char__item_selected'));
+        this.itemsRef[id].classList.add('char__item_selected');
+        this.itemsRef[id].focus();
+    }
+
     renderItem = (charList) => {
-        const card = charList.map(card => {
+        const card = charList.map((card, i) => {
             let imgStyle = {objectFit: 'cover'}
             if (card.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
                 imgStyle = {objectFit: 'fill'}
@@ -71,7 +84,11 @@ class CharList extends Component {
                 <li 
                     className="char__item"
                     key={card.id}
-                    onClick={() => this.props.onCharSelected(card.id)}
+                    ref={this.setRef}
+                    onClick={() => {
+                        this.props.onCharSelected(card.id);
+                        this.focusOnItem(i)
+                    }}
                 >
                     <img style={imgStyle} src={card.thumbnail} alt="abyss"/>
                     <div className="char__name">{card.name}</div>
@@ -111,6 +128,10 @@ class CharList extends Component {
             </div>
         )
     }
+}
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
